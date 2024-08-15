@@ -19,8 +19,8 @@ type jwtService struct {
 }
 
 // NewJWTService creates a new JWT service
-func NewJWTService() JWTService {
-	return &jwtService{secretKey: "secured_secret_key", issuer: "task-manager"}
+func NewJWTService(secret string) JWTService {
+	return &jwtService{secretKey: secret, issuer: "task-manager"}
 }
 
 // GenerateToken generates a new JWT token

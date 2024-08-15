@@ -15,7 +15,7 @@ type JWTServiceTestSuite struct {
 }
 
 func (suite *JWTServiceTestSuite) SetupTest() {
-	suite.jwtService = NewJWTService()
+	suite.jwtService = NewJWTService("test_secret")
 }
 
 func TestJWTServiceTestSuite(t *testing.T) {
