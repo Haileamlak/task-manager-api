@@ -124,11 +124,11 @@ The following are the main API endpoints:
   - `POST /auth/register`: User registration
 
 - **Task Management**
-    ***All Users***
+    - ***All Users***
       - `GET /tasks`: Retrieve all tasks
       - `GET /task/:id` Retrieve a task by ID
 
-    ***Admins only***
+    - ***Admins only***
       - `POST /tasks`: Create a new task
       - `PUT /tasks/:id`: Update an existing task
       - `DELETE /tasks/:id`: Delete a task
