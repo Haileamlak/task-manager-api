@@ -2,15 +2,17 @@ package infrastructure
 
 import (
 	// "errors"
+	"errors"
 	"net/http"
 	"net/http/httptest"
+	// domain "task-manager/Domain"
 	"testing"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
-	"github.com/dgrijalva/jwt-go"
 )
 
 type MockJWTService struct {
@@ -24,6 +26,10 @@ func (m *MockJWTService) GenerateToken(username string, role string) (string, er
 
 func (m *MockJWTService) ValidateToken(token string) (*jwt.Token, error) {
 	args := m.Called(token)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+
 	return args.Get(0).(*jwt.Token), args.Error(1)
 }
 
@@ -38,6 +44,7 @@ func (suite *AuthMiddlewareTestSuite) SetupTest() {
 	suite.jwtService = new(MockJWTService)
 	suite.authMiddleware = NewAuthMiddleware(suite.jwtService)
 	suite.router = gin.Default()
+	gin.SetMode(gin.TestMode)
 }
 
 func TestAuthMiddlewareTestSuite(t *testing.T) {
@@ -70,24 +77,24 @@ func (suite *AuthMiddlewareTestSuite) TestAuthenticate_Success() {
 	suite.jwtService.AssertExpectations(suite.T())
 }
 
-// func (suite *AuthMiddlewareTestSuite) TestAuthenticate_InvalidToken() {
-// 	suite.jwtService.On("ValidateToken", "invalid_token").Return(nil, errors.New("invalid token"))
+func (suite *AuthMiddlewareTestSuite) TestAuthenticate_InvalidToken() {
+	suite.jwtService.On("ValidateToken", "invalid_token").Return(nil, errors.New("invalid token"))
 
-// 	suite.router.Use(suite.authMiddleware.Authenticate())
+	suite.router.Use(suite.authMiddleware.Authenticate())
 
-// 	suite.router.GET("/test", func(ctx *gin.Context) {
-// 		ctx.JSON(http.StatusOK, gin.H{"message": "Authenticated"})
-// 	})
+	suite.router.GET("/test", func(ctx *gin.Context) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "Authenticated"})
+	})
 
-// 	w := httptest.NewRecorder()
-// 	req, _ := http.NewRequest("GET", "/test", nil)
-// 	req.Header.Set("Authorization", "Bearer invalid_token")
-// 	suite.router.ServeHTTP(w, req)
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("GET", "/test", nil)
+	req.Header.Set("Authorization", "Bearer invalid_token")
+	suite.router.ServeHTTP(w, req)
 
-// 	assert.Equal(suite.T(), http.StatusUnauthorized, w.Code)
-// 	assert.Contains(suite.T(), w.Body.String(), "invalid token")
-// 	suite.jwtService.AssertExpectations(suite.T())
-// }
+	assert.Equal(suite.T(), http.StatusUnauthorized, w.Code)
+	assert.Contains(suite.T(), w.Body.String(), "invalid token")
+	suite.jwtService.AssertExpectations(suite.T())
+}
 
 func (suite *AuthMiddlewareTestSuite) TestAuthorize_Success() {
 	token := &jwt.Token{
