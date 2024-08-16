@@ -12,7 +12,6 @@ Task Manager API is a robust and scalable RESTful API designed for managing task
 - [Running the Application](#running-the-application)
 - [Running Tests](#running-tests)
 - [API Endpoints](#api-endpoints)
-- [License](#license)
 
 ## Features
 
@@ -133,4 +132,4 @@ The following are the main API endpoints:
       - `PUT /tasks/:id`: Update an existing task
       - `DELETE /tasks/:id`: Delete a task
 
-For detailed API documentation, refer to the [API Documentation](#).
+For detailed API documentation, refer to the [API Documentation](https://documenter.getpostman.com/view/37482165/2sA3s7jpLU).
